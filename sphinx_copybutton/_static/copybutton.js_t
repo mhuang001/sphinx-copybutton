@@ -66,15 +66,16 @@ var copyTargetText = (trigger) => {
   var target = document.querySelector(trigger.attributes['data-clipboard-target'].value);
   var textContent = target.innerText.split('\n');
   var copybuttonPromptText = '{{ copybutton_prompt_text }}'; // Inserted from config
+  var copybuttonPromptText1 = '{{ copybutton_prompt_text1 }}'; // Inserted from config
   var onlyCopyPromptLines = {{ copybutton_only_copy_prompt_lines | lower }}; // Inserted from config
   var removePrompts = {{ copybutton_remove_prompts | lower }}; // Inserted from config
 
   // Text content line filtering based on prompts (if a prompt text is given)
-  if (copybuttonPromptText.length > 0) {
+  if ((copybuttonPromptText.length > 0) || (copybuttonPromptText1.length > 0)) {
     // If only copying prompt lines, remove all lines that don't start w/ prompt
     if (onlyCopyPromptLines) {
       linesWithPrompt = textContent.filter((line) => {
-        return line.startsWith(copybuttonPromptText) || (line.length == 0); // Keep newlines
+        return ((copybuttonPromptText.length > 0) && line.startsWith(copybuttonPromptText)) || ((copybuttonPromptText1.length > 0) && line.startsWith(copybuttonPromptText1)) || (line.length == 0); // Keep newlines
       });
       // Check to make sure we have at least one non-empty line
       var nonEmptyLines = linesWithPrompt.filter((line) => {return line.length > 0});
@@ -88,6 +89,9 @@ var copyTargetText = (trigger) => {
       textContent.forEach((line, index) => {
         if (line.startsWith(copybuttonPromptText)) {
           textContent[index] = line.slice(copybuttonPromptText.length);
+        }
+        if (line.startsWith(copybuttonPromptText1)) {
+          textContent[index] = line.slice(copybuttonPromptText1.length);
         }
       });
     }
